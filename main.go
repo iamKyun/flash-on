@@ -8,6 +8,9 @@ import (
 	"os/exec"
 )
 
+/**
+ * 此代码只针对windows 64位系统，其它系统或者其它文件只需要更改到对应的filePath，原理都一样
+ */
 func main() {
 	filePath := "C:\\Windows\\SysWOW64\\Macromed\\Flash\\Flash.ocx"
 	fmt.Println("读取文件：", filePath)
