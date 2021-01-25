@@ -9,29 +9,38 @@ import (
 )
 
 /**
- * 此代码只针对windows 64位系统，其它系统或者其它文件只需要更改到对应的filePath，原理都一样
+ * 此代码只针对windows系统
  */
 func main() {
-	filePath := "C:\\Windows\\SysWOW64\\Macromed\\Flash\\Flash.ocx"
-	fmt.Println("读取文件：", filePath)
+	// 获取操作系统位数
+	bit := 32 << (^uint(0) >> 63)
+	var filePath string
+	if bit == 64 {
+		filePath = "C:\\Windows\\SysWOW64\\Macromed\\Flash\\Flash.ocx"
+	} else {
+		filePath = "C:\\Windows\\System32\\Macromed\\Flash\\Flash.ocx"
+	}
+	fmt.Println("！！！运行前请关闭浏览器！！！")
+	fmt.Printf("%d位操作系统\n", bit)
+	fmt.Printf("读取文件：%s\n", filePath)
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		fmt.Println("读取文件错误，请检查文件是否存在")
+		fmt.Println("读取文件失败，请检查文件是否存在")
 		return
 	}
 	targetBytes := []byte{0x00, 0x00, 0x40, 0x46, 0x3E, 0x6F, 0x77, 0x42}
-	fmt.Println("查找目标代码...")
+	fmt.Println("开始查找目标代码...")
 	if bytes.Contains(content, targetBytes) {
-		fmt.Println("找到了目标代码，尝试修改...")
-		fmt.Println("修改文件权限...")
+		fmt.Println("开始尝试修改...")
+		fmt.Println("获取文件权限...")
 		c := exec.Command("cmd", "/C", "TAKEOWN", "/F", filePath, "/a")
 		if err := c.Run(); err != nil {
-			fmt.Println("修改文件权限失败，请用管理员权限运行")
+			fmt.Println("修改文件权限失败，请用管理员权限运行！")
 			return
 		}
 		c2 := exec.Command("cmd", "/C", "ICACLS", filePath, "/grant", "Administrators:F")
 		if err := c2.Run(); err != nil {
-			fmt.Println("修改文件权限失败，请用管理员权限运行")
+			fmt.Println("修改文件权限失败，请用管理员权限运行！")
 			return
 		}
 		targetIndex := bytes.Index(content, targetBytes)
