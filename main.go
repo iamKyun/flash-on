@@ -20,6 +20,7 @@ func main() {
 	} else {
 		filePath = "C:\\Windows\\System32\\Macromed\\Flash\\Flash.ocx"
 	}
+	fmt.Println("Flash On v0.3")
 	fmt.Println("！！！运行前请关闭浏览器！！！")
 	fmt.Printf("%d位操作系统\n", bit)
 	fmt.Printf("读取文件：%s\n", filePath)
