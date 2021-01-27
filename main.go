@@ -28,35 +28,39 @@ func main() {
 		fmt.Println("读取文件失败，请检查文件是否存在")
 		return
 	}
-	targetBytes := []byte{0x00, 0x00, 0x40, 0x46, 0x3E, 0x6F, 0x77, 0x42}
+	targetBytes := []byte{0x00, 0x00, 0x40, 0x46, 0x3E, 0x6F, 0x77}
 	fmt.Println("开始查找目标代码...")
 	if bytes.Contains(content, targetBytes) {
-		fmt.Println("开始尝试修改...")
-		fmt.Println("获取文件权限...")
-		c := exec.Command("cmd", "/C", "TAKEOWN", "/F", filePath, "/a")
-		if err := c.Run(); err != nil {
-			fmt.Println("修改文件权限失败，请用管理员权限运行！")
-			return
-		}
-		c2 := exec.Command("cmd", "/C", "ICACLS", filePath, "/grant", "Administrators:F")
-		if err := c2.Run(); err != nil {
-			fmt.Println("修改文件权限失败，请用管理员权限运行！")
-			return
-		}
 		targetIndex := bytes.Index(content, targetBytes)
 		modifyIndex := targetIndex + 7
-		content[modifyIndex] = 0x72
-		err := ioutil.WriteFile(filePath, content, os.ModePerm)
-		if err == nil {
-			fmt.Println("修改成功，flash已被激活")
+		if content[modifyIndex] == 0x72 {
+			fmt.Println("已被激活的Flash，不需要操作")
 		} else {
-			fmt.Println("修改失败，原因：")
-			fmt.Println(err)
+			fmt.Println("查找到了目标代码")
+			fmt.Println("开始尝试修改...")
+			fmt.Println("获取文件权限...")
+			c := exec.Command("cmd", "/C", "TAKEOWN", "/F", filePath, "/a")
+			if err := c.Run(); err != nil {
+				fmt.Println("修改文件权限失败，请用管理员权限运行！")
+				return
+			}
+			c2 := exec.Command("cmd", "/C", "ICACLS", filePath, "/grant", "Administrators:F")
+			if err := c2.Run(); err != nil {
+				fmt.Println("修改文件权限失败，请用管理员权限运行！")
+				return
+			}
+			content[modifyIndex] = 0x72
+			err := ioutil.WriteFile(filePath, content, os.ModePerm)
+			if err == nil {
+				fmt.Println("修改成功，flash已被激活")
+			} else {
+				fmt.Println("修改失败，原因：")
+				fmt.Println(err)
+			}
 		}
 	} else {
 		fmt.Println("找不到目标代码，修改失败")
 	}
-
 	fmt.Print("\n按enter键退出...")
 	fmt.Scanln()
 }
