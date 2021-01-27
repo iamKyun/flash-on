@@ -33,7 +33,8 @@ func main() {
 	fmt.Printf("%d位操作系统\n", bit)
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		PrintRed("\n读取文件失败，请检查文件是否存在\n")
+		PrintRed("\n读取文件失败，请检查文件是否存在：\n")
+		fmt.Println(filePath)
 		return
 	}
 	targetBytes := []byte{0x00, 0x00, 0x40, 0x46, 0x3E, 0x6F, 0x77}
